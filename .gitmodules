@@ -4,3 +4,6 @@
 [submodule "ros2_ws/src/irobot_create_msgs"]
 	path = ros2_ws/src/irobot_create_msgs
 	url = https://github.com/Bmoradi93/irobot_create_msgs.git
+[submodule "turtlebot4_robot"]
+	path = turtlebot4_robot
+	url = https://github.com/Bmoradi93/turtlebot4_robot.git
