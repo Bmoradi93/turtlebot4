@@ -50,6 +50,7 @@ _deps
 
 devel/
 logs/
+log/
 build/
 install/
 bin/
