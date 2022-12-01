@@ -7,3 +7,6 @@
 [submodule "ros2_ws/src/turtlebot4_robot"]
 	path = ros2_ws/src/turtlebot4_robot
 	url = https://github.com/Bmoradi93/turtlebot4_robot.git
+[submodule "ros2_ws/src/turtlebot4_simulator"]
+	path = ros2_ws/src/turtlebot4_simulator
+	url = https://github.com/turtlebot/turtlebot4_simulator.git

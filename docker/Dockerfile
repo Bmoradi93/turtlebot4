@@ -57,6 +57,12 @@ RUN apt-get update && apt-get install ros-galactic-desktop ros-noetic-desktop-fu
 
 RUN apt-get update && apt-get install -y ros-galactic-ros1-bridge ros-galactic-irobot* ros-galactic-turtlebot4* ros-galactic-control-msgs 
 
+# Simulator installation 
+RUN apt-get update && sudo apt-get install wget
+RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+RUN wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+RUN apt-get update && apt-get install -y ignition-edifice
+
 ADD cyclonedds.xml /etc/cyclonedds.xml
 
 RUN echo "export ROS_DOMAIN_ID=0" >> ~/.bashrc
