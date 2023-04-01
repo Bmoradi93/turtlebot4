@@ -10,3 +10,6 @@
 [submodule "ros2_ws/src/turtlebot4_simulator"]
 	path = ros2_ws/src/turtlebot4_simulator
 	url = https://github.com/turtlebot/turtlebot4_simulator.git
+[submodule "ros2_ws/src/urg_node2"]
+	path = ros2_ws/src/urg_node2
+	url = https://github.com/Hokuyo-aut/urg_node2.git
