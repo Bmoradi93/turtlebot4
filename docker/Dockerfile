@@ -53,15 +53,12 @@ RUN rm -rf /etc/apt/sources.list.d/ros2.list
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --fix-missing ros-humble-desktop python3-argcomplete || (apt-get update && apt-get install -y --fix-missing ros-humble-desktop python3-argcomplete)
+RUN apt-get update && apt-get install -y --fix-missing ros-humble-desktop python3-argcomplete ros-humble-ros-gz-bridge ros-humble-ros-gz-interfaces || (apt-get update && apt-get install -y --fix-missing ros-humble-desktop python3-argcomplete ros-humble-ros-gz-bridge ros-humble-ros-gz-interfaces)
 
-# RUN apt-get update && apt-get install -y --fix-missing ros-humble-ros1-bridge ros-humble-control-msgs || (apt-get update && apt-get install -y --fix-missing ros-humble-ros1-bridge ros-humble-control-msgs) 
+RUN apt-get update && apt-get install -y --fix-missing ros-humble-control-msgs ros-humble-rmw-cyclonedds-cpp ros-humble-diagnostic-updater ros-humble-laser-proc || (apt-get update && apt-get install -y --fix-missing ros-humble-control-msgs ros-humble-rmw-cyclonedds-cpp ros-humble-diagnostic-updater ros-humble-laser-proc) 
 
-# Simulator installation 
-# RUN apt-get update && sudo apt-get install wget
-# RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
-# RUN wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-# RUN apt-get update && apt-get install -y --fix-missing ignition-garden || (apt-get update && apt-get install -y --fix-missing ignition-garden)
+# Simulator installation - using ROS2 Gazebo packages
+RUN apt-get update && apt-get install -y --fix-missing ros-humble-gazebo-ros-pkgs ros-humble-gazebo-ros2-control libignition-gui6-dev || (apt-get update && apt-get install -y --fix-missing ros-humble-gazebo-ros-pkgs ros-humble-gazebo-ros2-control libignition-gui6-dev)
 
 ADD docker/cyclonedds.xml /etc/cyclonedds.xml
 
