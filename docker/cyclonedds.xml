@@ -1,8 +1,0 @@
-<CycloneDDS>
-    <Domain>
-        <General>
-            <DontRoute>true</DontRoute>
-            <NetworkInterfaceAddress>wlp0s20f3</NetworkInterfaceAddress>
-        </General>
-    </Domain>
-</CycloneDDS>
