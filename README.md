@@ -1,217 +1,98 @@
 # TurtleBot4 Development Environment
 
-A comprehensive ROS2-based robotics platform built on the iRobot Create3 base with custom TurtleBot4 modifications.
+This repository provides a Docker-based development environment for the TurtleBot4, allowing you to replace the onboard Raspberry Pi with a more powerful laptop. This setup builds a comprehensive ROS 2 Humble environment from the official `osrf/ros:humble-desktop` base image and includes all necessary packages to communicate with the TurtleBot4, including the `CycloneDDS` middleware required for recent firmware versions.
 
-## 📋 Overview
+## Prerequisites
 
-TurtleBot4 is a powerful educational and research robotics platform that combines:
-- **iRobot Create3** as the base platform
-- **ROS2 Humble** for modern robotics development
-- **Gazebo/Ignition** for simulation
-- **OAK-D Pro** for 3D vision and AI
-- **RPLidar** for 2D laser scanning
-- **Navigation2** for autonomous navigation
-- **SLAM Toolbox** for mapping and localization
+-   [Docker](https://docs.docker.com/get-docker/) must be installed on your system.
+-   Your user must be in the `docker` group to run Docker commands without `sudo`.
+-   You have a physical network connection to your TurtleBot4 (either Wi-Fi, a direct LAN cable, or a USB-C data cable).
 
-## 🚀 Quick Start
+## Quick Start
 
-```bash
-# Show all available commands
-make help
+1.  **Build the Docker Image:**
+    -   Open a terminal in the project directory and run:
+        ```bash
+        make build
+        ```
+    -   This will build a local Docker image named `turtlebot4-dev` with the required dependencies.
 
-# Complete development setup (build, start, enter container)
-make dev
+2.  **Start the Container:**
+    -   Once the build is complete, start the container:
+        ```bash
+        make start
+        ```
+    -   This will run the container in the background, named `turtlebot4-container`.
 
-# Or step by step:
-make build    # Build Docker image
-make start    # Start container
-make enter    # Enter container
-```
+3.  **Enter the Container:**
+    -   Once the container is running, use the following command to get a shell inside it:
+        ```bash
+        make enter
+        ```
+    -   This command will ask you to choose your connection method (Wi-Fi or Direct LAN/USB-C) and will automatically configure the ROS 2 environment for you.
 
-## 🐳 Docker Management
+4.  **View Robot Topics:**
+    -   Inside the container's shell, you can now run ROS 2 commands to interact with your robot:
+        ```bash
+        ros2 topic list
+        ```
 
-### Image Management
-- `make build` - Build the TurtleBot4 Docker image
-- `make build-no-cache` - Build without using cache (clean build)
-- `make pull` - Pull latest image from registry (if available)
+## Connecting to the TurtleBot4
 
-### Container Management
-- `make start` - Start the TurtleBot4 container
-- `make enter` - Enter the running container
-- `make stop` - Stop the container
-- `make restart` - Restart the container
-- `make status` - Show container and image status
-- `make logs` - Show container logs
+This project supports two connection methods, which are handled by the interactive `make enter` command.
 
-### Cleanup
-- `make clean` - Remove stopped containers and unused images
-- `make clean-all` - Remove ALL containers and images (WARNING: destructive)
-- `make reset` - Stop, clean, and restart
+### Connecting via Wi-Fi (Recommended)
 
-## 🔧 Development Commands
+This method uses a ROS 2 Discovery Server, which provides the most reliable connection.
 
-### Workspace Building
-- `make build-workspace` - Build the ROS2 workspace inside container
-- `make build-workspace-parallel` - Build with parallel jobs (faster)
+1.  **Connect Robot and Laptop to the Same Wi-Fi Network:**
+    -   Ensure your laptop is connected to your Wi-Fi network.
+    -   [Provision the TurtleBot4 to the same Wi-Fi network](https://iroboteducation.github.io/create3_docs/setup/provision/).
 
-### ROS1 Bridge
-- `make ros1-bridge` - Start ROS1 bridge in tmux session
+2.  **Start the Discovery Server on Your Laptop:**
+    -   In a separate terminal on your laptop (not in the Docker container), run:
+        ```bash
+        make discovery-server
+        ```
+    -   This will start the server and print your laptop's local IP address.
 
-## 🎮 Simulation Commands
+3.  **Configure the Robot to Use the Discovery Server:**
+    -   Find your robot's IP address on the Wi-Fi network.
+    -   Open a web browser and navigate to the robot's IP address.
+    -   Go to the **Application -> Configuration** page.
+    -   Check the box to **Enable Fast DDS discovery server**.
+    -   In the address field, enter your laptop's IP address (from step 2) followed by `:11811`.
+    -   Save the settings and restart the robot's application.
 
-- `make sim` - Launch TurtleBot4 simulation (default: lite model)
-- `make sim-standard` - Launch simulation with standard model
-- `make sim-warehouse` - Launch simulation in warehouse world
+4.  **Connect from the Docker Container:**
+    -   Run `make enter` and select the **Wi-Fi** option. It will ask for your laptop's IP to complete the connection.
 
-## ⚡ Convenience Commands
+### Connecting via LAN / USB-C
 
-- `make quick-start` - Build image and start container
-- `make dev` - Complete development setup (build, start, enter)
-- `make info` - Show system information and requirements
+This method creates a direct, private network between your laptop and the robot.
 
-## 📖 Usage Examples
+1.  **Physical Connection:**
+    -   **For USB-C:** Ensure the physical **USB/BLE toggle switch** on the robot's adapter board is set to the **USB** position. Connect a USB-C cable from the robot to your laptop.
+    -   **For LAN:** Connect a standard Ethernet cable from your laptop's LAN port to the robot's Ethernet port.
 
-### First Time Setup
-```bash
-# Build the Docker image (this may take a while)
-make build
+2.  **Network Configuration:**
+    -   The robot's static IP address on this direct link is `192.168.186.2`.
+    -   You must configure your laptop's corresponding network interface with a static IP on the same network: `192.168.186.3` with a subnet mask of `255.255.255.0`.
+    -   Verify the connection with `make ping-robot-lan`.
 
-# Start the container
-make start
+3.  **Connect from the Docker Container:**
+    -   Run `make enter` and select the **Direct LAN / USB-C** option.
 
-# Enter the container
-make enter
-```
+## `Makefile` Commands
 
-### Daily Development Workflow
-```bash
-# Start your development session
-make dev
-
-# Inside the container, build the workspace
-make build-workspace
-
-# Launch simulation
-make sim
-```
-
-### Working with Simulation
-```bash
-# Launch simulation with standard model in warehouse
-make sim-warehouse
-
-# Or launch with standard model
-make sim-standard
-```
-
-### Troubleshooting
-```bash
-# Check container status
-make status
-
-# View container logs
-make logs
-
-# Reset everything if something goes wrong
-make reset
-```
-
-## 🏗️ Project Structure
-
-```
-turtlebot4/
-├── docker/                 # Docker configuration
-│   ├── Dockerfile         # Main Docker image definition
-│   └── cyclonedds.xml     # DDS configuration
-├── ros2_ws/               # ROS2 workspace
-│   └── src/
-│       ├── create3_sim/           # iRobot Create3 simulation
-│       ├── irobot_create_msgs/    # Create3 message definitions
-│       ├── turtlebot4_robot/      # Real robot packages
-│       ├── turtlebot4_simulator/  # Simulation packages
-│       ├── turtlebot4_description/ # Robot models and URDF
-│       ├── turtlebot4_navigation/  # Navigation configuration
-│       ├── turtlebot4_msgs/       # Custom messages
-│       └── urg_node2/             # RPLidar driver
-├── scripts/               # Utility scripts
-├── Makefile              # Development automation
-└── dependencies.repos    # External dependencies
-```
-
-## 🔧 System Requirements
-
-- **Docker** with NVIDIA runtime support
-- **X11 forwarding** capability
-- **NVIDIA GPU drivers** (for simulation)
-- **Make utility**
-- **Ubuntu 22.04** (Jammy) or compatible system
-
-## 📦 What's Included
-
-### Core Components
-- **ROS2 Humble** with desktop packages
-- **TurtleBot4 packages** (all variants)
-- **iRobot Create3 packages** (base platform)
-- **Navigation2** stack
-- **SLAM Toolbox**
-- **DepthAI packages** for OAK-D camera
-- **RPLidar packages**
-- **Development tools** (vim, tmux, etc.)
-- **CycloneDDS** configuration for ROS2 communication
-
-### Hardware Support
-- **OAK-D Pro**: 3D camera for depth sensing and AI
-- **RPLidar**: 2D laser scanner for SLAM and navigation
-- **Custom Tower**: Modular sensor mounting system
-- **User Interface**: Buttons, display, and LED indicators
-
-### Simulation Capabilities
-- **Multiple Worlds**: Warehouse, maze, depot environments
-- **GUI Plugins**: Custom TurtleBot4 interface in Gazebo
-- **ROS-Gazebo Bridge**: Seamless communication between ROS and simulation
-
-## 🚨 Troubleshooting
-
-### Container won't start
-- Check if Docker is running: `sudo systemctl status docker`
-- Check if NVIDIA runtime is available: `docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi`
-
-### X11 forwarding issues
-- Make sure X11 forwarding is enabled: `echo $DISPLAY`
-- Try running: `xhost +local:docker`
-
-### Permission issues
-- Make sure your user is in the docker group: `groups $USER`
-- If not, add yourself: `sudo usermod -aG docker $USER`
-
-### Out of disk space
-- Clean up Docker resources: `make clean`
-- For more aggressive cleanup: `make clean-all` (WARNING: removes everything)
-
-### Build failures
-- Check network connectivity
-- Try building with `--fix-missing` flag
-- Use `make build-no-cache` for clean builds
-
-## 📚 Additional Resources
-
-- [TurtleBot 4 User Manual](https://turtlebot.github.io/turtlebot4-user-manual/software/turtlebot4_packages.html)
-- [ROS2 Documentation](https://docs.ros.org/en/humble/)
-- [iRobot Create3 Documentation](https://irobot.gitbook.io/create3-docs/)
-- [Gazebo Documentation](https://gazebosim.org/docs)
-
-## 🤝 Contributing
-
-This project follows standard ROS2 development practices. Please refer to the [TurtleBot 4 User Manual](https://turtlebot.github.io/turtlebot4-user-manual/software/turtlebot4_packages.html) for detailed development guidelines.
-
-## 📄 License
-
-This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
-
-## 🏷️ Version Information
-
-- **ROS2 Version**: Humble (Ubuntu 22.04)
-- **Base Platform**: iRobot Create3
-- **Simulation**: Gazebo/Ignition
-- **DDS**: CycloneDDS
-- **Last Updated**: 2024
+-   `make help`: Show the help message.
+-   `make build`: Build the custom `turtlebot4-dev` Docker image.
+-   `make start`: Run the Docker container in the background.
+-   `make enter`: Enter the running container with an interactive shell.
+-   `make stop`: Stop and remove the container.
+-   `make restart`: Restart the container.
+-   `make status`: Show the status of the container and image.
+-   `make logs`: View the container's logs.
+-   `make discovery-server`: Run the ROS 2 Discovery Server on your laptop.
+-   `make ping-robot-lan`: Ping the robot on its static LAN IP.
+-   `make clean-all`: Stop and remove all Docker containers and images on your system.
